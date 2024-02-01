@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: spark-pi
+spec:
+  template:
+    spec:
+      containers:
+        - name: spark-pi
+          image: spark:3.5.0
+          command: ["/opt/spark/bin/spark-submit"]
+          args:
+            - --master
+            - k8s://url:port
+            - --deploy-mode
+            - cluster
+            - --name
+            - spark-pi
+            - --class
+            - org.apache.spark.examples.SparkPi
+            - --conf
+            - spark.executor.instances=1
+            - --conf
+            - spark.kubernetes.namespace=default
+            - --conf
+            - spark.kubernetes.container.image=spark:3.5.0
+            - local:///opt/spark/examples/jars/spark-examples_2.12-3.0.0.jar
+            - "1000"
+      restartPolicy: Never
